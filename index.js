@@ -18,7 +18,7 @@ const {
 } = require("./utils/channels");
 const { generateEmbed, generateButton } = require("./utils/components");
 
-const { TOKEN, GUILD_ID, TICKET_CLOSE_IN_DAYS } = process.env;
+const { TOKEN, GUILD_ID, TICKET_CLOSE_IN_DAYS, ROLE_ID } = process.env;
 
 const client = new Client({
 	intents: [
@@ -57,17 +57,25 @@ client.once(Events.ClientReady, async (readyClient) => {
 	}
 });
 
-client.on(Events.GuildMemberAdd, async (member) => {
+client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
 	try {
 		const {
 			guild,
 			user: { id },
-		} = member;
+		} = newMember;
 
-		const channel = await createChannel(guild, member);
+		if (oldMember.roles.cache.size >= newMember.roles.cache.size) return;
+
+		const addedRole = newMember.roles.cache.find(
+			(role) => !oldMember.roles.cache.has(role.id)
+		);
+
+		if (!addedRole || addedRole.id !== ROLE_ID) return;
+
+		const channel = await createChannel(guild, newMember);
 		await writeChannelData(channel, id);
 
-		const embed = generateEmbed(member);
+		const embed = generateEmbed(newMember);
 		const button = generateButton();
 
 		await sendMessageInChannel(channel, embed, button);
