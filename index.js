@@ -68,8 +68,7 @@ client.on(Events.GuildMemberAdd, async (member) => {
 		const embed = generateEmbed(member);
 		const button = generateButton();
 
-		const message = await sendMessageInChannel(channel, embed, button);
-		await message.pin();
+		await sendMessageInChannel(channel, embed, button);
 	} catch (error) {
 		console.log(error);
 	}
