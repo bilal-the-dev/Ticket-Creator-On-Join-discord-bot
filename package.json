@@ -12,6 +12,8 @@
     "eslint": "^8.57.0"
   },
   "dependencies": {
+    "discord.js": "^14.14.1",
+    "dotenv": "^16.4.5",
     "node-cron": "^3.0.3"
   }
 }
