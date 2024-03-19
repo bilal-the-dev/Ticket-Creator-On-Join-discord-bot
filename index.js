@@ -55,19 +55,21 @@ client.once(Events.ClientReady, async (readyClient) => {
 	}
 });
 
-client.on(Events.MessageCreate, async (message) => {
+client.on(Events.GuildMemberAdd, async (member) => {
 	try {
-		const { guild, member } = message;
+		const {
+			guild,
+			user: { id },
+		} = member;
 
-		if (message.content !== "s") return;
 		const channel = await createChannel(guild, member);
-		await writeChannelData(channel);
+		await writeChannelData(channel, id);
 
 		const embed = generateEmbed(member);
 		const button = generateButton();
 
-		const messages = await sendMessageInChannel(channel, embed, button);
-		await messages.pin();
+		const message = await sendMessageInChannel(channel, embed, button);
+		await message.pin();
 	} catch (error) {
 		console.log(error);
 	}
@@ -93,6 +95,29 @@ client.on(Events.InteractionCreate, async (interaction) => {
 		await sendLogs(guild, channel);
 
 		await channel.delete();
+	} catch (error) {
+		console.log(error);
+	}
+});
+
+client.on(Events.GuildMemberRemove, async (member) => {
+	try {
+		const data = require("./data.json");
+
+		const {
+			user: { id },
+			guild,
+		} = member;
+
+		const channels = data.filter((entry) => entry.userId === id);
+
+		for (const entry of channels) {
+			const channel = await guild.channels.fetch(entry.channelId);
+
+			await deleteChannelData(channel);
+			await sendLogs(guild, channel);
+			await channel.delete();
+		}
 	} catch (error) {
 		console.log(error);
 	}

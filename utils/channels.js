@@ -20,10 +20,10 @@ const createChannel = async function (guild, member) {
 	return channel;
 };
 
-const writeChannelData = async function (channel) {
+const writeChannelData = async function (channel, userId) {
 	const data = require("./../data.json");
 
-	data.push({ channelId: channel.id, date: Date.now() });
+	data.push({ channelId: channel.id, date: Date.now(), userId });
 
 	fs.writeFile("./data.json", JSON.stringify(data), (err) => {
 		if (err) console.log("Error writing to file:", err);
