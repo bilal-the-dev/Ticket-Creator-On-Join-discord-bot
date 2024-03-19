@@ -43,7 +43,9 @@ client.once(Events.ClientReady, async (readyClient) => {
 			for (const entry of data) {
 				if (entry.date + DAY_IN_MS > Date.now()) continue;
 
-				const channel = await guild.channels.fetch(entry.channelId);
+				const channel = await guild.channels
+					.fetch(entry.channelId)
+					.catch((e) => console.log(e));
 
 				await deleteChannelData(channel);
 				await sendLogs(guild, channel);
@@ -110,8 +112,12 @@ client.on(Events.GuildMemberRemove, async (member) => {
 
 		const channels = data.filter((entry) => entry.userId === id);
 
+		console.log(channels);
+
 		for (const entry of channels) {
-			const channel = await guild.channels.fetch(entry.channelId);
+			const channel = await guild.channels
+				.fetch(entry.channelId)
+				.catch((e) => console.log(e));
 
 			await deleteChannelData(channel);
 			await sendLogs(guild, channel);
